@@ -11,6 +11,7 @@ function FormComponent() {
   });
 
   const [people, setPeople] = useState([]);
+  const [editPerson, setEditPerson] = useState(null); // Add state for the person being edited
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,11 +67,28 @@ function FormComponent() {
     });
   };
 
+  const handleEdit = (person) => {
+    setEditPerson(person); // Set the person to be edited
+  };
+
+  const handleSaveEdit = () => {
+    // Find the index of the person in the array
+    const index = people.findIndex((p) => p.id === editPerson.id);
+
+    if (index !== -1) {
+      // Update the person's details
+      const updatedPeople = [...people];
+      updatedPeople[index] = editPerson;
+      setPeople(updatedPeople);
+      setEditPerson(null); // Clear the editPerson state
+    }
+  };
+
   return (
     <div>
       <h2>Person Form</h2>
       <form>
-        <input
+      <input
           type="text"
           name="firstName"
           value={formData.firstName}
@@ -105,7 +123,8 @@ function FormComponent() {
           onChange={handleChange}
           placeholder="Number"
         />
-        <button type="button" onClick={handleSubmit}>
+        {/* ... Your form input fields ... */}
+        <button style={{backgroundColor:"#3498DB", fontSize:"15px"}} type="button" onClick={handleSubmit}>
           Submit
         </button>
       </form>
@@ -127,21 +146,62 @@ function FormComponent() {
           {people.map((person) => (
             <tr key={person.id}>
               <td>{person.id}</td>
-              <td>{person.firstName}</td>
-              <td>{person.lastName}</td>
-              <td>{person.email}</td>
-              <td>{person.gender}</td>
-              <td>{person.number}</td>
+              <td>{editPerson && editPerson.id === person.id ? (
+                <input
+                  type="text"
+                  value={editPerson.firstName}
+                  onChange={(e) => setEditPerson({ ...editPerson, firstName: e.target.value })}
+                />
+              ) : person.firstName}</td>
+              <td>{editPerson && editPerson.id === person.id ? (
+                <input
+                  type="text"
+                  value={editPerson.lastName}
+                  onChange={(e) => setEditPerson({ ...editPerson, lastName: e.target.value })}
+                />
+              ) : person.lastName}</td>
+              <td>{editPerson && editPerson.id === person.id ? (
+                <input
+                  type="email"
+                  value={editPerson.email}
+                  onChange={(e) => setEditPerson({ ...editPerson, email: e.target.value })}
+                />
+              ) : person.email}</td>
+              <td>{editPerson && editPerson.id === person.id ? (
+                <input
+                  type="text"
+                  value={editPerson.gender}
+                  onChange={(e) => setEditPerson({ ...editPerson, gender: e.target.value })}
+                />
+              ) : person.gender}</td>
+              <td>{editPerson && editPerson.id === person.id ? (
+                <input
+                  type="text"
+                  value={editPerson.number}
+                  onChange={(e) => setEditPerson({ ...editPerson, number: e.target.value })}
+                />
+              ) : person.number}</td>
               <td>
-                <button
-                  onClick={() => {
-                    // Handle delete action using person.id
-                    const updatedPeople = people.filter((p) => p.id !== person.id);
-                    setPeople(updatedPeople);
-                  }}
-                >
-                  Delete
-                </button>
+                {editPerson && editPerson.id === person.id ? (
+                  <span>
+                  <button style={{backgroundColor:"yellow", fontSize:"15px"}} onClick={handleSaveEdit}>Save</button>
+                  <span style={{ margin: '0 4px' }}></span> {/* Add some margin for spacing */}
+                  <button style={{backgroundColor:"Green", fontSize:"15px"}} onClick={() => handleEdit(person)}>Edit</button>
+                </span>
+                ) : (
+                  <span>
+      <button style={{backgroundColor:"Green", fontSize:"15px"}} onClick={() => handleEdit(person)}>Edit</button>
+      <span style={{ margin: '0 4px' }}></span> {/* Add some margin for spacing */}
+      <button
+        style={{backgroundColor:"Red", fontSize:"15px"}} onClick={() => {
+          const updatedPeople = people.filter((p) => p.id !== person.id);
+          setPeople(updatedPeople);
+        }}
+      >
+        Delete
+      </button>
+    </span>
+                )}
               </td>
             </tr>
           ))}
